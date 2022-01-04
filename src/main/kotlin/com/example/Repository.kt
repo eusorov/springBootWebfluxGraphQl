@@ -67,14 +67,14 @@ class Repository {
         return Flux.fromIterable(filtered)
     }
 
-    suspend fun findOne(id: Int): Mono<Delivery?> {
+    fun findOne(id: Int): Mono<Delivery?> {
         return Mono.just(id).mapNotNull {
             deliveries.find { d -> d.deliveryId == id }
         }
     }
 
     @Synchronized
-    suspend fun deliveryReceivedOn(id: Int, receivedOn: LocalDateTime): Mono<Delivery?> {
+    fun deliveryReceivedOn(id: Int, receivedOn: LocalDateTime): Mono<Delivery?> {
         val deliveryUpdated = findOne(id).mapNotNull { //            {
             it?.receivedOn = receivedOn
             it?.deliveryProgressType = DeliveryProgressType.RECEIVED
@@ -84,7 +84,7 @@ class Repository {
     }
 
     @Synchronized
-    suspend fun save(delivery: Delivery): Mono<Int> {
+    fun save(delivery: Delivery): Mono<Int> {
         val maxId = deliveries.map { it.deliveryId }.reduce { acc, cur -> if ((cur ?: 0) > (acc ?: 0)) cur else acc }
         val nexId = (maxId?:0) + 1
         val newDelivery = delivery.copy(deliveryId = nexId)
