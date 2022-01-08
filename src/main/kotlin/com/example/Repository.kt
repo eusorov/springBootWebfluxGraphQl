@@ -67,10 +67,18 @@ class Repository {
         return Flux.fromIterable(filtered)
     }
 
+    /**
+     * can now throw Error
+     */
     fun findOne(id: Int): Mono<Delivery?> {
         return Mono.just(id).mapNotNull {
             deliveries.find { d -> d.deliveryId == id }
-        }
+        }.switchIfEmpty(Mono.error(
+            DeliveryNotFoundException(
+                "Unable to find a delivery with the provided id",
+                "id"
+            )
+        ))
     }
 
     @Synchronized
@@ -89,7 +97,23 @@ class Repository {
         val nexId = (maxId?:0) + 1
         val newDelivery = delivery.copy(deliveryId = nexId)
 
+
         deliveries = deliveries.plus(newDelivery)
         return Mono.just(nexId)
     }
+}
+
+class UserError : GraphQLError{
+    override fun getMessage(): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun getLocations(): MutableList<SourceLocation> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getErrorType(): ErrorClassification {
+        TODO("Not yet implemented")
+    }
+
 }

@@ -71,4 +71,20 @@ class QueryIT(@Autowired private val testClient: WebTestClient) {
                 .jsonPath(DATA_JSON_PATH.plus(".findAllByFilter.[0].deliveryId")).isEqualTo(expectedIds[0].toString())
                 .jsonPath(DATA_JSON_PATH.plus(".findAllByFilter.[1].deliveryId")).isEqualTo(expectedIds[1].toString())
     }
+
+    @Test
+    fun `verify id query with NoFoundException`() {
+        val query = "findById( id :10) { deliveryId }"
+        val expectedData = "Exception while fetching data (/findById) : Unable to find a delivery with the provided id"
+
+        testClient.post()
+            .uri(GRAPHQL_ENDPOINT)
+            .accept(APPLICATION_JSON)
+            .contentType(GRAPHQL_MEDIA_TYPE)
+            .bodyValue("query { $query }")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .jsonPath(ERRORS_JSON_PATH.plus(".[0].message")).isEqualTo(expectedData)
+    }
 }

@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono
 class DeliveryQuery (val repository: Repository): Query {
 
     suspend fun findById(id: Int): Delivery? {
-        return repository.findOne(id).awaitSingle()
+        return repository.findOne(id).awaitSingleOrNull()
     }
 
     suspend fun findAll(): List<Delivery> {
